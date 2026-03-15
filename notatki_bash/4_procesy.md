@@ -33,18 +33,24 @@ Używamy, gdy chcemy "zrobić zdjęcie" procesom i np. przefiltrować je przez `
 
 ---
 
-## 3. Sygnały i kończenie procesów (kill)
-Zamykanie procesów odbywa się poprzez wysyłanie do nich sygnałów.
+## 3.Zarządzanie Procesami: Tabela Sygnałów (Signals)
 
-**Składnia:** `kill -[SYGNAŁ] PID`
+Sygnały to sposób komunikacji z procesami. Można je wysyłać za pomocą komendy `kill`, `pkill` lub skrótów klawiszowych.
 
-| Sygnał (Numer) | Nazwa | Opis |
-| :--- | :--- | :--- |
-| `15` | SIGTERM | **Grzeczne zamknięcie.** Daje procesowi czas na zapisanie danych i wyjście. |
-| `9` | SIGKILL | **Bezwzględne ubicie.** System natychmiast wycina proces z pamięci. |
-| `1` | SIGHUP | **Restart:** Często używany do przeładowania konfiguracji bez wyłączania usługi. |
+| Numer | Nazwa | Skrót | Opis i Zastosowanie |
+| :--- | :--- | :--- | :--- |
+| **1** | **SIGHUP** | - | **Restart/Hangup:** Przeładowanie konfiguracji procesu bez jego wyłączania. |
+| **2** | **SIGINT** | `Ctrl+C` | **Przerwanie:** Grzeczne zatrzymanie procesu z klawiatury. |
+| **3** | **SIGQUIT**| `Ctrl+\` | **Wyjście:** Zamknięcie procesu z wygenerowaniem zrzutu pamięci (core dump). |
+| **9** | **SIGKILL** | - | **Zabójstwo:** Natychmiastowe i bezwzględne ubicie. Proces nie może go zignorować. |
+| **15** | **SIGTERM** | - | **Zakończenie:** Domyślny sygnał `kill`. Prośba o zamknięcie (pozwala zapisać dane). |
+| **18** | **SIGCONT** | - | **Kontynuacja:** Wznowienie procesu, który został zatrzymany sygnałem STOP. |
+| **19** | **SIGSTOP** | `Ctrl+Z` | **Zatrzymanie:** Pauza. Proces zostaje w pamięci, ale nie zużywa CPU. |
 
-> **Przykład:** `kill -9 1234` (Natychmiast ubiij proces o numerze 1234).
+### Praktyczne przykłady:
+- `kill -l` – wyświetla listę wszystkich dostępnych sygnałów.
+- `kill -9 1234` – zabija proces o PID 1234 (używaj w ostateczności).
+- `pkill -HUP nginx` – przeładowuje konfigurację Nginxa (użycie nazwy zamiast numeru).
 
 ---
 
