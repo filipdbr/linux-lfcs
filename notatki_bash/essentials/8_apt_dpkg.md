@@ -25,6 +25,23 @@ Dpkg nie potrafi sam pobierać plików z internetu ani rozwiązywać zależnośc
 - `dpkg -S /sciezka/do/pliku` – odwrotność powyższego: mówi Ci, który pakiet zainstalował ten konkretny plik na dysku.
 - `dpkg --get-selections` – eksportuje listę wszystkich zainstalowanych pakietów (przydatne do odtworzenia systemu).
 
+# 📦 dpkg - Debian Package Manager
+
+Narzędzie niskiego poziomu do obsługi plików `.deb`. Nie rozwiązuje zależności automatycznie (w przeciwieństwie do `apt`).
+
+| Flaga | Działanie | Przykład |
+| :--- | :--- | :--- |
+| `-i` | **Install** - instaluje plik .deb | `sudo dpkg -i google-chrome.deb` |
+| `-r` | **Remove** - usuwa pakiet (zostawia konfigurację) | `sudo dpkg -r wget` |
+| `-P` | **Purge** - usuwa wszystko (łącznie z konfami) | `sudo dpkg -P wget` |
+| `-l` | **List** - lista zainstalowanych pakietów | `dpkg -l | grep python` |
+| `-L` | **List files** - gdzie są pliki danego pakietu | `dpkg -L tar` |
+| `-S` | **Search** - czyj to plik? | `dpkg -S /bin/bash` |
+| `-s` | **Status** - szczegółowe info o pakiecie | `dpkg -s libc6` |
+
+**Złota zasada:** Jeśli `dpkg -i` zgłosi błędy zależności (dependency errors), napraw je komendą:
+`sudo apt install -f`
+
 
 
 ### Repozytoria i pliki źródłowe
