@@ -1,0 +1,53 @@
+# Dokumentacja Systemowa: Powłoka, Procesy i Zmienne Środowiskowe
+
+## 1. Wykonywanie skryptów: Source vs Execution
+Zrozumienie kontekstu wykonania jest kluczowe dla zachowania spójności konfiguracji sesji.
+
+- **Uruchomienie bezpośrednie (./script.sh lub bash script.sh):**
+    - Tworzy nowy proces potomny (subshell).
+    - Wszystkie definicje zmiennych, aliasów i funkcji są lokalne dla tego procesu.
+    - Po zakończeniu skryptu, proces potomny zostaje zamknięty, a zmiany w środowisku są tracone.
+    - Wymaga uprawnień do wykonywania (chmod +x).
+
+- **Polecenie source (source script.sh lub . script.sh):**
+    - Czyta i wykonuje zawartość pliku w ramach bieżącego procesu powłoki.
+    - Zmienne i funkcje zdefiniowane w pliku stają się dostępne w obecnej sesji po zakończeniu działania skryptu.
+    - Nie wymaga uprawnień do wykonywania (wymaga jedynie uprawnień do odczytu).
+
+## 2. Zarządzanie Zmiennymi Środowiskowymi
+Zmienne środowiskowe sterują zachowaniem powłoki i aplikacji systemowych.
+
+- **Definiowanie i Eksport:**
+    - `ZMIENNA="wartosc"` – tworzy zmienną lokalną powłoki (niewidoczną dla procesów potomnych).
+    - `export ZMIENNA="wartosc"` – promuje zmienną do poziomu środowiska (widoczna dla skryptów i programów uruchamianych z tej sesji).
+
+- **Poziomy trwałości konfiguracji:**
+    - **Poziom sesji:** Definicja bezpośrednio w terminalu. Działa do momentu wylogowania lub zamknięcia okna.
+    - **Poziom użytkownika (~/.bashrc):** Najczęstsze miejsce dla aliasów i zmiennych osobistych. Wymaga przeładowania: `source ~/.bashrc`.
+    - **Poziom profilu logowania (~/.bash_profile lub ~/.profile):** Wykonywany tylko podczas logowania (np. przez SSH).
+    - **Poziom systemowy (/etc/environment):** Plik konfiguracyjny (nie skrypt), używany przez moduł pam_env. Format: `KLUCZ=WARTOSC` (bez słowa export).
+    - **Poziom systemowy globalny (/etc/profile.d/):** Katalog na skrypty powłoki wykonywane dla każdego użytkownika podczas logowania.
+
+- **Narzędzia diagnostyczne:**
+    - `env`: Wyświetla wyłącznie wyeksportowane zmienne środowiskowe.
+    - `set`: Wyświetla wszystkie zmienne (lokalne i eksportowane) oraz funkcje powłoki.
+    - `printenv ZMIENNA`: Wyświetla wartość konkretnej zmiennej środowiskowej.
+
+## 3. Sygnały i Kontrola Procesów
+System operacyjny komunikuje się z procesami za pomocą sygnałów (Signals).
+
+- **Kluczowe sygnały kill:**
+    - **SIGTERM (15):** Sygnał domyślny. Prośba o zakończenie. Pozwala procesowi na zwolnienie pamięci i zamknięcie otwartych plików (graceful shutdown).
+    - **SIGKILL (9):** Wymuszone zakończenie przez jądro systemu. Proces nie może zignorować tego sygnału ani wykonać operacji czyszczenia. Używać tylko w ostateczności.
+    - **SIGHUP (1):** Sygnał rozłączenia. Często używany do zmuszenia demonów (usług) do ponownego wczytania konfiguracji bez restartu procesu.
+
+- **Narzędzia zarządzania:**
+    - `pgrep -u <user> <pattern>`: Znajduje PID procesów na podstawie nazwy i właściciela.
+    - `ps aux --sort=-%cpu`: Wyświetla procesy wszystkich użytkowników, sortując je według zużycia procesora.
+    - `kill -l`: Wyświetla listę wszystkich dostępnych sygnałów systemowych.
+
+## 4. Praca z archiwami i wyszukiwaniem (Find & Tar)
+- **find -exec konstrukcja:**
+    - `\;` – Uruchamia komendę osobno dla każdego wyniku (wysoki koszt wydajnościowy).
+    - `+` – Grupuje wyniki i przekazuje je jako listę argumentów do jednej komendy (optymalne dla tar i chmod).
+- **tar -P (Absolute Names):** Zapobiega domyślnemu usuwaniu wiodącego ukośnika `/` ze ścieżek, co pozwala na rozpakowanie plików dokładnie w te same lokalizacje bez użycia ścieżek relatywnych.
